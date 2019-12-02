@@ -91,6 +91,7 @@ class BaseDetector(nn.Module):
                     data,
                     result,
                     img_norm_cfg,
+                    frame_index,
                     dataset=None,
                     score_thr=0.3):
         if isinstance(result, tuple):
@@ -128,9 +129,10 @@ class BaseDetector(nn.Module):
                         0, 256, (1, 3), dtype=np.uint8)
                     mask = maskUtils.decode(segms[i]).astype(np.bool)
                     img_show[mask] = img_show[mask] * 0.5 + color_mask * 0.5
+
             # draw bounding boxes
             labels = [
-                np.full(bbox.shape[0], i, dtype=np.int32)
+                np.full(bbox.shape[0], i, dtype=np.int32)  # category_id -1
                 for i, bbox in enumerate(bbox_result)
             ]
             labels = np.concatenate(labels)
@@ -139,4 +141,6 @@ class BaseDetector(nn.Module):
                 bboxes,
                 labels,
                 class_names=class_names,
+                wait_time=1,
+                out_file="output/polyp/"+str("{:04d}".format(frame_index))+".png",
                 score_thr=score_thr)

@@ -16,8 +16,18 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
     parser.add_argument('config', help='train config file path')
     parser.add_argument('--work_dir', help='the dir to save logs and models')
+
+    """
+    Difference between resume_from and load_from: resume_from loads both the model weights and optimizer status, and
+    the epoch is also inherited from the specified checkpoint. It is usually used for resuming the training process
+    that is interrupted accidentally. load_from only loads the model weights and the training epoch starts from 0.
+    It is usually used for finetuning.
+    """
+
     parser.add_argument(
         '--resume_from', help='the checkpoint file to resume from')
+    parser.add_argument(
+        '--load_from', help='the checkpoint file to load from')
     parser.add_argument(
         '--validate',
         action='store_true',

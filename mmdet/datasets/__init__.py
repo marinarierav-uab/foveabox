@@ -10,9 +10,10 @@ from .utils import random_scale, show_ann, to_tensor
 from .voc import VOCDataset
 from .wider_face import WIDERFaceDataset
 from .xml_style import XMLDataset
+from .polyp_datasets import Polyp
 
 __all__ = [
-    'CustomDataset', 'XMLDataset', 'CocoDataset', 'VOCDataset',
+    'Polyp', 'CustomDataset', 'XMLDataset', 'CocoDataset', 'VOCDataset',
     'CityscapesDataset', 'GroupSampler', 'DistributedGroupSampler',
     'build_dataloader', 'to_tensor', 'random_scale', 'show_ann',
     'ConcatDataset', 'RepeatDataset', 'ExtraAugmentation', 'WIDERFaceDataset',

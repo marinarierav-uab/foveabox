@@ -1,3 +1,11 @@
+#custom ignored folders and files:
+
+data/
+output/
+*.json
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

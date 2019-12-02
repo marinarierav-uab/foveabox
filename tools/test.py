@@ -27,7 +27,7 @@ def single_gpu_test(model, data_loader, show=False):
         results.append(result)
 
         if show:
-            model.module.show_result(data, result, dataset.img_norm_cfg)
+            model.module.show_result(data, result, dataset.img_norm_cfg, i)
 
         batch_size = data['img'][0].size(0)
         for _ in range(batch_size):
@@ -148,6 +148,12 @@ def main():
         torch.backends.cudnn.benchmark = True
     cfg.model.pretrained = None
     cfg.data.test.test_mode = True
+
+    output="output/polyp/"
+    if os.path.exists(output):
+        shutil.rmtree(output)  # delete output folder
+    os.makedirs(output)  # make new output folder
+
 
     # init distributed env first, since logger depends on the dist info.
     if args.launcher == 'none':
