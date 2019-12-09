@@ -223,16 +223,16 @@ if __name__ == '__main__':
         }
     }
 
-    """
-    samples_to_coco("../data/samples/images/test/",
-                    "jpg",
-                    "../data/samples/annotations/test.json")
-    
+    samples_to_coco("../data/CVC-VideoClinicDBtrain_valid/images/test/",
+                    "png",
+                    "../data/CVC-VideoClinicDBtrain_valid/annotations/test.json")
 
+    """
     samples_to_coco("../data/CVC-VideoClinicDBtrain_valid/images/test-vid01/",
                     "png",
                     "../data/CVC-VideoClinicDBtrain_valid/annotations/test-vid01.json")
-    """
+    
+    
 
     folders_to_coco("/home/marina/Documents/COCO/validtrain/img/Renamed/",
                     "png",
@@ -245,7 +245,7 @@ if __name__ == '__main__':
                     "/home/marina/Documents/COCO/validtrain/GT/Renamed/",
                     "../data/CVC-VideoClinicDBtrain_valid/annotations/renamed-valid.json",
                     train_val_histos, val=True)
-
+    """
 
     """
     folders_to_coco("/home/yael/PycharmProjects/detectron2/datasets/CVC-VideoClinicDBtrain_valid/images_train/",
