@@ -44,6 +44,13 @@ class CustomDataset(Dataset):
                  img_prefix,
                  img_scale,
                  img_norm_cfg,
+                 hsv_h=0.5,  # image HSV-Hue augmentation (fraction)
+                 hsv_s=0.1,  # image HSV-Saturation augmentation (fraction)
+                 hsv_v=0.1,  # image HSV-Value augmentation (fraction)
+                 degrees=5,  # image rotation (+/- deg)
+                 translate=0.1,  # image translation (+/- fraction)
+                 scale=0.1,  # image scale (+/- gain)
+                 shear=2,  # image shear (+/- deg)
                  multiscale_mode='value',
                  size_divisor=None,
                  proposal_file=None,

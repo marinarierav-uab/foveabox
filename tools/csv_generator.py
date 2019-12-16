@@ -34,12 +34,18 @@ def show_csv(team, original):
 
     already_seen_vids = []
 
+    acc_id=0
     for i, image in enumerate(data):
 
         image_id = image['image_id']
         image_name = images[image_id-1]['file_name']
 
         nvid = image_name.split('-')[0]
+
+        if nvid not in already_seen_vids:
+          acc_id=image_id-1
+          already_seen_vids.append(nvid)
+
 
         det = image['bbox']
         x1 = int(det[0])
@@ -58,21 +64,24 @@ def show_csv(team, original):
         """
 
         # DETECT
-        writelines_detection[nvid].append([image_id-1, 1, conf])
+        writelines_detection[nvid].append([image_id-acc_id-1, 1, conf])
         # LOCAL
-        writelines_localization[nvid].append([image_id-1, cx, cy, conf, clase])
+        writelines_localization[nvid].append([image_id-acc_id-1, cx, cy, conf, clase])
 
-    for vid in range(1,19):
+    for vid in range(1, 19):
         nvid = format(int(vid), '03d')
-        with open('results/Detection/' + output + '/' + format(int(nvid), '02d') + '.csv', 'w') as file:
-            for line in writelines_detection[nvid]:
-                file.write(str(line[0]) + ',' + str(line[1]) + ',' + str(line[2]) + '\n')  # separated by ,
 
-        with open('results/Localization/' + output + '/' + format(int(nvid), '02d') + '.csv', 'w') as file:
-            for line in writelines_localization[nvid]:
-                file.write(
-                    str(line[0]) + ',' + str(line[1]) + ',' + str(line[2]) + ',' + str(line[3]) + ',' + str(
-                        line[4]) + '\n')  # separated by ,
+        if writelines_detection[nvid]:
+            with open('results/Detection/' + output + '/' + format(int(nvid), '02d') + '.csv', 'w') as file:
+                for line in writelines_detection[nvid]:
+                    file.write(str(line[0]) + ',' + str(line[1]) + ',' + str(line[2]) + '\n')  # separated by ,
+
+        if writelines_localization[nvid]:
+            with open('results/Localization/' + output + '/' + format(int(nvid), '02d') + '.csv', 'w') as file:
+                for line in writelines_localization[nvid]:
+                    file.write(
+                        str(line[0]) + ',' + str(line[1]) + ',' + str(line[2]) + ',' + str(line[3]) + ',' + str(
+                            line[4]) + '\n')  # separated by ,
 
 
     print('Done!')

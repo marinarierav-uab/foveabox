@@ -1,8 +1,10 @@
 #custom ignored folders and files:
 
 data/
+results/
 output/
 *.json
+.~lock*
 
 
 
