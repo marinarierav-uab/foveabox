@@ -10,6 +10,7 @@ from mmdet.apis import (get_root_logger, init_dist, set_random_seed,
                         train_detector)
 from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
+import time
 
 
 def parse_args():
@@ -70,6 +71,8 @@ def main():
         cfg.resume_from = args.resume_from
     cfg.gpus = args.gpus
 
+    t = time.time()
+
     if args.autoscale_lr:
         # apply the linear scaling rule (https://arxiv.org/abs/1706.02677)
         cfg.optimizer['lr'] = cfg.optimizer['lr'] * cfg.gpus / 8
@@ -112,6 +115,8 @@ def main():
         distributed=distributed,
         validate=args.validate,
         logger=logger)
+
+    print(cfg.total_epochs, "epochs completed in", time.time()-t, "hours.")
 
 
 if __name__ == '__main__':
