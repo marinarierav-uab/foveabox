@@ -116,7 +116,7 @@ def main():
         validate=args.validate,
         logger=logger)
 
-    print(cfg.total_epochs, "epochs completed in", time.time()-t, "hours.")
+    print(cfg.total_epochs, "epochs completed in", '{0:.5f}'.format((time.time()-t)/3600), "hours.")
 
 
 if __name__ == '__main__':
