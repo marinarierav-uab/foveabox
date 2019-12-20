@@ -122,7 +122,7 @@ total_epochs = 10
 device_ids = range(4)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/cluster/exp2'
+work_dir = './work_dirs/exp2'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
