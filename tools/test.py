@@ -25,6 +25,9 @@ def single_gpu_test(model, data_loader, show=False):
         with torch.no_grad():
             result = model(return_loss=False, rescale=not show, **data)
         results.append(result)
+        print()
+        print(results)
+        print()
 
         if show:
             model.module.show_result(data, result, dataset.img_norm_cfg, i)
@@ -32,6 +35,9 @@ def single_gpu_test(model, data_loader, show=False):
         batch_size = data['img'][0].size(0)
         for _ in range(batch_size):
             prog_bar.update()
+
+    #torch.onnx.export(model.module, (data["img"][0], data["img_meta"][0].data[0]), "marina.onnx", verbose=True, export_params=True)
+
     return results
 
 
