@@ -15,19 +15,30 @@ from mmdet.core import coco_eval, results2json, wrap_fp16_model
 from mmdet.datasets import build_dataloader, build_dataset
 from mmdet.models import build_detector
 
+import numpy as np
+
 
 def single_gpu_test(model, data_loader, show=False):
     model.eval()
     results = []
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
+
+    detections = np.zeros([len(data_loader),10])
+
     for i, data in enumerate(data_loader):
         with torch.no_grad():
             result = model(return_loss=False, rescale=not show, **data)
         results.append(result)
-        print()
-        print(results)
-        print()
+
+        # [ < frame >, < id >, < bb_left >, < bb_top >, < bb_width >, < bb_height >, < conf >, < x >, < y >, < z >]
+        bbox = result[0][0]
+        mot_challenge = np.array([i, -1]+list(bbox[0:5])+[-1, -1, -1])
+        detections[i] = mot_challenge
+
+        #print("\n", mot_challenge, "\n")
+
+        # model.module.neck.fpn_convs[-1].conv.weight.shape
 
         if show:
             model.module.show_result(data, result, dataset.img_norm_cfg, i)
