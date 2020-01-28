@@ -346,10 +346,16 @@ class FoveaHead(nn.Module):
             bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 4).exp()
             nms_pre = cfg.get('nms_pre', -1)
             if nms_pre > 0 and scores.shape[0] > nms_pre:
+
+                # nms_pre: num maxim de deteccions previes
                 max_scores, _ = scores.max(dim=1)
                 _, topk_inds = max_scores.topk(nms_pre)
+
+                # es queda amb les "millors" deteccions (de mes score), tantes com valor nms_pre.
                 bbox_pred = bbox_pred[topk_inds, :]
                 scores = scores[topk_inds, :]
+
+                # points
                 y = y[topk_inds]
                 x = x[topk_inds]
             x1 = (stride * x - base_len * bbox_pred[:, 0]).clamp(min=0, max=img_shape[1] - 1)
@@ -380,3 +386,115 @@ class FoveaHead(nn.Module):
                 cfg.nms,
                 cfg.max_per_img)
         return det_bboxes, det_labels
+
+    def get_bboxes_and_feats(self,
+                   cls_scores,
+                   bbox_preds,
+                   feats,
+                   img_metas,
+                   cfg,
+                   rescale=None):
+        assert len(cls_scores) == len(bbox_preds) == len(feats)
+        num_levels = len(cls_scores)
+        featmap_sizes = [featmap.size()[-2:] for featmap in cls_scores]
+        points = self.get_points(featmap_sizes, bbox_preds[0].dtype,
+                                 bbox_preds[0].device, flatten=True)
+        result_list = []
+        for img_id in range(len(img_metas)):
+            cls_score_list = [
+                cls_scores[i][img_id].detach() for i in range(num_levels)
+            ]
+            bbox_pred_list = [
+                bbox_preds[i][img_id].detach() for i in range(num_levels)
+            ]
+
+            feats_list = [
+                feats[i][img_id].detach() for i in range(num_levels)
+            ]
+
+            img_shape = img_metas[img_id]['img_shape']
+            scale_factor = img_metas[img_id]['scale_factor']
+            det_bboxes = self.get_bboxes_and_feats_single(cls_score_list, bbox_pred_list, feats_list,
+                                                          featmap_sizes, points, img_shape, scale_factor, cfg, rescale)
+            result_list.append(det_bboxes)
+        return result_list
+
+    def get_bboxes_and_feats_single(self,
+                          cls_scores,
+                          bbox_preds,
+                          features,
+                          featmap_sizes,
+                          point_list,
+                          img_shape,
+                          scale_factor,
+                          cfg,
+                          rescale=False, debug=False):
+        assert len(cls_scores) == len(bbox_preds) == len(point_list) == len(features)
+        det_bboxes = []
+        det_scores = []
+        det_feats = []
+
+        # per cada nivell dels 5 de la FPN:
+        for cls_score, bbox_pred, feat, featmap_size, stride, base_len, (y, x) in zip(
+                cls_scores, bbox_preds, features, featmap_sizes, self.strides, self.base_edge_list, point_list):
+
+            assert cls_score.size()[-2:] == bbox_pred.size()[-2:] == feat.size()[-2:]
+
+            feats = feat.permute(1, 2, 0).reshape(
+                -1, 256)
+
+            scores = cls_score.permute(1, 2, 0).reshape(
+                -1, self.cls_out_channels).sigmoid()
+            bbox_pred = bbox_pred.permute(1, 2, 0).reshape(-1, 4).exp()
+
+            nms_pre = cfg.get('nms_pre', -1)
+            if nms_pre > 0 and scores.shape[0] > nms_pre:
+
+                # nms_pre: num maxim de deteccions previes
+                max_scores, _ = scores.max(dim=1)
+                _, topk_inds = max_scores.topk(nms_pre)
+
+                # es queda amb les "millors" deteccions (de mes score), tantes com valor nms_pre.
+                bbox_pred = bbox_pred[topk_inds, :]
+                scores = scores[topk_inds, :]
+                feats = feats[topk_inds, :]
+
+                # points
+                y = y[topk_inds]
+                x = x[topk_inds]
+
+            x1 = (stride * x - base_len * bbox_pred[:, 0]).clamp(min=0, max=img_shape[1] - 1)
+            y1 = (stride * y - base_len * bbox_pred[:, 1]).clamp(min=0, max=img_shape[0] - 1)
+            x2 = (stride * x + base_len * bbox_pred[:, 2]).clamp(min=0, max=img_shape[1] - 1)
+            y2 = (stride * y + base_len * bbox_pred[:, 3]).clamp(min=0, max=img_shape[0] - 1)
+            bboxes = torch.stack([x1, y1, x2, y2], -1)
+
+            det_bboxes.append(bboxes)
+            det_scores.append(scores)
+            det_feats.append(feats)
+
+        det_feats = torch.cat(det_feats)
+        det_bboxes = torch.cat(det_bboxes)
+        if rescale:
+            det_bboxes /= det_bboxes.new_tensor(scale_factor)
+        det_scores = torch.cat(det_scores)
+        padding = det_scores.new_zeros(det_scores.shape[0], 1)
+        det_scores = torch.cat([padding, det_scores], dim=1)
+
+        if debug:
+            det_bboxes, det_labels, det_feats = multiclass_nms(
+                det_bboxes,
+                det_scores,
+                det_feats,
+                cfg['score_thr'],
+                cfg['nms'],
+                cfg['max_per_img'])
+        else:
+            det_bboxes, det_labels, det_feats = multiclass_nms(
+                det_bboxes,
+                det_scores,
+                det_feats,
+                cfg.score_thr,
+                cfg.nms,
+                cfg.max_per_img)
+        return det_bboxes, det_labels, det_feats

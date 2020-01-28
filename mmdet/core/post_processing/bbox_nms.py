@@ -5,6 +5,7 @@ from mmdet.ops.nms import nms_wrapper
 
 def multiclass_nms(multi_bboxes,
                    multi_scores,
+                   multi_feats,
                    score_thr,
                    nms_cfg,
                    max_num=-1,
@@ -27,7 +28,7 @@ def multiclass_nms(multi_bboxes,
             are 0-based.
     """
     num_classes = multi_scores.shape[1]
-    bboxes, labels = [], []
+    bboxes, labels, feats = [], [], []
     nms_cfg_ = nms_cfg.copy()
     nms_type = nms_cfg_.pop('type', 'nms')
     nms_op = getattr(nms_wrapper, nms_type)
@@ -40,26 +41,37 @@ def multiclass_nms(multi_bboxes,
             _bboxes = multi_bboxes[cls_inds, :]
         else:
             _bboxes = multi_bboxes[cls_inds, i * 4:(i + 1) * 4]
+        _feats = multi_feats[cls_inds, :]
         _scores = multi_scores[cls_inds, i]
         if score_factors is not None:
             _scores *= score_factors[cls_inds]
         cls_dets = torch.cat([_bboxes, _scores[:, None]], dim=1)
-        cls_dets, _ = nms_op(cls_dets, **nms_cfg_)
-        cls_labels = multi_bboxes.new_full((cls_dets.shape[0], ),
-                                           i - 1,
+
+        # cls_dets. shape: (num_of_det, 5) --> columns: [x1 y1 x2 y2 conf]
+        cls_dets, inds = nms_op(cls_dets, **nms_cfg_)
+
+        cls_labels = multi_bboxes.new_full((cls_dets.shape[0], ),  # cls_dets.shape[0] = num_of_det
+                                           i - 1,  # omplir tot amb id de la classe
                                            dtype=torch.long)
+        cls_feats = multi_feats[inds, :]
+
         bboxes.append(cls_dets)
         labels.append(cls_labels)
+        feats.append(cls_feats)
+
     if bboxes:
         bboxes = torch.cat(bboxes)
         labels = torch.cat(labels)
+        feats = torch.cat(feats)
         if bboxes.shape[0] > max_num:
             _, inds = bboxes[:, -1].sort(descending=True)
             inds = inds[:max_num]
             bboxes = bboxes[inds]
             labels = labels[inds]
+            feats = feats[inds]
     else:
         bboxes = multi_bboxes.new_zeros((0, 5))
         labels = multi_bboxes.new_zeros((0, ), dtype=torch.long)
+        feats = multi_bboxes.new_zeros((0, ), dtype=torch.long)
 
-    return bboxes, labels
+    return bboxes, labels, feats

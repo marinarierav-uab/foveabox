@@ -24,19 +24,23 @@ def single_gpu_test(model, data_loader, show=False):
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
 
-    detections = np.zeros([len(data_loader),10])
+    detections = np.zeros([len(data_loader), 266]) # 10 mot challenge + 256 features
 
     for i, data in enumerate(data_loader):
         with torch.no_grad():
-            result = model(return_loss=False, rescale=not show, **data)
+            result, features = model(return_loss=False, rescale=not show, **data)
         results.append(result)
 
         # [ < frame >, < id >, < bb_left >, < bb_top >, < bb_width >, < bb_height >, < conf >, < x >, < y >, < z >]
-        bbox = result[0][0]
-        mot_challenge = np.array([i, -1]+list(bbox[0:5])+[-1, -1, -1])
-        detections[i] = mot_challenge
+        if result[0].size > 0:
+            bbox = result[0][0]
 
-        #print("\n", mot_challenge, "\n")
+            f = features.permute(1,0).cpu().numpy()
+
+            mot_challenge = np.concatenate((np.array([i, -1]+list(bbox[0:5])+[-1, -1, -1]), f[:, 0]))
+            detections[i] = mot_challenge
+
+            print("\n", mot_challenge, "\n")
 
         # model.module.neck.fpn_convs[-1].conv.weight.shape
 
