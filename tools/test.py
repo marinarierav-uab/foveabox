@@ -24,7 +24,7 @@ def single_gpu_test(model, data_loader, show=False):
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
 
-    detections = np.zeros([len(data_loader), 266]) # 10 mot challenge + 256 features
+    detections = np.zeros([len(data_loader), 266])  # 10 mot challenge + 256 features
 
     for i, data in enumerate(data_loader):
         with torch.no_grad():
@@ -35,12 +35,13 @@ def single_gpu_test(model, data_loader, show=False):
         if result[0].size > 0:
             bbox = result[0][0]
 
-            f = features.permute(1,0).cpu().numpy()
+            f = features.permute(1, 0).cpu().numpy()
 
-            mot_challenge = np.concatenate((np.array([i, -1]+list(bbox[0:5])+[-1, -1, -1]), f[:, 0]))
-            detections[i] = mot_challenge
+            w = bbox[2]-bbox[0]
+            h = bbox[3]-bbox[1]
 
-            print("\n", mot_challenge, "\n")
+            detections[i] = np.concatenate((np.array([i, -1]+list(bbox[0:2])+[w, h, bbox[-1], -1, -1, -1]), f[:, 0]))
+            #print("\n", mot_challenge, "\n")
 
         # model.module.neck.fpn_convs[-1].conv.weight.shape
 
@@ -52,6 +53,9 @@ def single_gpu_test(model, data_loader, show=False):
             prog_bar.update()
 
     #torch.onnx.export(model.module, (data["img"][0], data["img_meta"][0].data[0]), "marina.onnx", verbose=True, export_params=True)
+
+    np.save("detections/prova", detections)
+    #np.save("detections/debug", detections)
 
     return results
 

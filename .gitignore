@@ -3,6 +3,7 @@
 data/
 results/
 output/
+detections/
 *.json
 .~lock*
 
