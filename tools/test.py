@@ -32,16 +32,21 @@ def single_gpu_test(model, data_loader, show=False):
         results.append(result)
 
         # [ < frame >, < id >, < bb_left >, < bb_top >, < bb_width >, < bb_height >, < conf >, < x >, < y >, < z >]
-        if result[0].size > 0:
-            bbox = result[0][0]
 
-            f = features.permute(1, 0).cpu().numpy()
+        for r in result:
+            if r.size > 0:
+                bbox = r[0]
 
-            w = bbox[2]-bbox[0]
-            h = bbox[3]-bbox[1]
+                f = features.permute(1, 0).cpu().numpy()
 
-            detections[i] = np.concatenate((np.array([i, -1]+list(bbox[0:2])+[w, h, bbox[-1], -1, -1, -1]), f[:, 0]))
-            #print("\n", mot_challenge, "\n")
+                w = bbox[2]-bbox[0]
+
+
+                h = bbox[3]-bbox[1]
+
+                detections[i] = np.concatenate((np.array([i, -1]+list(bbox[0:2])+[w, h, bbox[-1], -1, -1, -1]), f[:, 0]))
+                #print("\n", mot_challenge, "\n")
+                break
 
         # model.module.neck.fpn_convs[-1].conv.weight.shape
 
@@ -54,10 +59,7 @@ def single_gpu_test(model, data_loader, show=False):
 
     #torch.onnx.export(model.module, (data["img"][0], data["img_meta"][0].data[0]), "marina.onnx", verbose=True, export_params=True)
 
-    np.save("detections/prova", detections)
-    #np.save("detections/debug", detections)
-
-    return results
+    return results, detections
 
 
 def multi_gpu_test(model, data_loader, tmpdir=None):
@@ -174,7 +176,7 @@ def main():
     cfg.model.pretrained = None
     cfg.data.test.test_mode = True
 
-    output="output/polyp/"
+    output = "output/polyp/"
     if os.path.exists(output):
         shutil.rmtree(output)  # delete output folder
     os.makedirs(output)  # make new output folder
@@ -212,10 +214,16 @@ def main():
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs = single_gpu_test(model, data_loader, args.show)
+        outputs, detections = single_gpu_test(model, data_loader, args.show)
+
+        np.save("detections/prova", detections)
+        np.save("detections/"+args.json_out.split('/')[-1], detections)
+
     else:
         model = MMDistributedDataParallel(model.cuda())
         outputs = multi_gpu_test(model, data_loader, args.tmpdir)
+
+
 
     rank, _ = get_dist_info()
     if args.out and rank == 0:

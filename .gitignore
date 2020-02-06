@@ -1,5 +1,7 @@
 #custom ignored folders and files:
 
+
+configs/debug_cfg.py
 data/
 results/
 output/

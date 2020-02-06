@@ -1,5 +1,5 @@
 import datetime
-
+import os
 import cv2
 import numpy as np
 #from pycocotools import coco
@@ -44,7 +44,7 @@ def folders_to_coco(images_dir, images_extension, masks_dir, output_file, histol
     image_id = 1
     annot_id = 1
 
-    images = glob(images_dir + "*." + images_extension)
+    images = glob(os.path.join(images_dir,"*." + images_extension))
 
     if train:
         images = [im for im in images if int(im.split('/')[-1].split('-')[0]) < 16]
@@ -223,9 +223,12 @@ if __name__ == '__main__':
         }
     }
 
-    samples_to_coco("../data/CVC-VideoClinicDBtrain_valid/images/test/",
-                    "png",
-                    "../data/CVC-VideoClinicDBtrain_valid/annotations/test.json")
+    for vid in range(1, 19):
+        folders_to_coco(os.path.join("/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/images", str(vid)),
+                        "png",
+                        os.path.join("/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/masks", str(vid)),
+                        os.path.join("/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/test", '{:02d}.json'.format(vid)),
+                        train_val_histos)
 
     """
     samples_to_coco("../data/CVC-VideoClinicDBtrain_valid/images/test-vid01/",

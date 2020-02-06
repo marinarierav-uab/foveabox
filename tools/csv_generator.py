@@ -5,9 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-def show_csv(team, original):
+def show_csv(team, output, original):
 
-    output = team.split('.bbox.json')[0].split('json/')[-1]
+    if output=="":
+        output = team.split('.bbox.json')[0].split('json/')[-1]
 
     writelines_detection = dict()
     writelines_localization = dict()
@@ -28,13 +29,9 @@ def show_csv(team, original):
     if not os.path.exists('results/Localization/' + output):
         os.makedirs('results/Localization/' + output)  # make new output folder
 
-    im = cv2.imread("output/polyp/0000.png")
-    plt.imshow(im)
-    #plt.show()
-
     already_seen_vids = []
 
-    acc_id=0
+    acc_id = 0
     for i, image in enumerate(data):
 
         image_id = image['image_id']
@@ -43,9 +40,8 @@ def show_csv(team, original):
         nvid = image_name.split('-')[0]
 
         if nvid not in already_seen_vids:
-          acc_id=image_id-1
-          already_seen_vids.append(nvid)
-
+            acc_id = image_id-1
+            already_seen_vids.append(nvid)
 
         det = image['bbox']
         x1 = int(det[0])
@@ -89,9 +85,11 @@ def show_csv(team, original):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('team', type=str, help='name of json detected bbox annotations file')
-    parser.add_argument('original', type=str, help='name of json original annotation file')
+    parser.add_argument('--json', type=str, help='name of json detected bbox annotations file')
+    parser.add_argument('--original', type=str, help='name of json original annotation file')
+    parser.add_argument("--out", "--output_folder", type=str, default=None)
+
     opt = parser.parse_args()
     print(opt)
 
-    show_csv(opt.team, opt.original)
+    show_csv(opt.json, opt.out, opt.original)

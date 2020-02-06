@@ -153,6 +153,8 @@ def process_video_for_localization(file, has_confidence, threshold, vid_folder):
 
     for frame in sorted(os.listdir(vid_folder)):
         i+=1
+
+        #print("frame", i)
         polyp_n = int(frame.split("_")[0].split("-")[1])
         im_frame = Image.open(os.path.join(vid_folder, frame))
         im_frame_np = np.asarray(im_frame, dtype=int)
