@@ -44,7 +44,7 @@ def folders_to_coco(images_dir, images_extension, masks_dir, output_file, histol
     image_id = 1
     annot_id = 1
 
-    images = glob(os.path.join(images_dir,"*." + images_extension))
+    images = glob(os.path.join(images_dir, "*." + images_extension))
 
     if train:
         images = [im for im in images if int(im.split('/')[-1].split('-')[0]) < 16]
@@ -106,7 +106,7 @@ def no_histo_folders_to_coco(images_dir, images_extension, masks_dir, output_fil
     image_id = 1
     annot_id = 1
 
-    images = glob(os.path.join(images_dir,"*." + images_extension))
+    images = glob(os.path.join(images_dir, "*." + images_extension))
 
     for image in images:
         size = cv2.imread(image, 0).shape
@@ -279,14 +279,24 @@ if __name__ == '__main__':
         }
     }
 
+    folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
+                    "png",
+                    "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
+                    "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train-val/train.json",
+                    train_val_histos, train=True)
+    folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
+                    "png",
+                    "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
+                    "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train-val/val.json",
+                    train_val_histos, val=True)
 
-
+    """
     no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-300/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/cvc-colondb-300/mask_polyp",
                     "/home/marina/GitHub/foveabox/data/cvc-colondb/annotations/300.json")
 
-    """
+
     for vid in range(1, 19):
         folders_to_coco(os.path.join("/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/images", str(vid)),
                         "png",
