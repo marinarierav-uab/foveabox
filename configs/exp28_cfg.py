@@ -45,7 +45,7 @@ test_cfg = dict(
     max_per_img=100)
 # dataset settings
 dataset_type = 'Polyp'
-data_root = 'data/cvc-colondb/'
+data_root = 'data/CVC-VideoClinicDBtrain_valid/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 data = dict(
@@ -53,11 +53,11 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/612.json',
-        img_prefix=data_root + 'images/612/',
+        ann_file=data_root + 'annotations/renamed-train.json',
+        img_prefix=data_root + 'images/train/',
         #img_scale=[(384, 288), (384*0.9, 288*0.9), (384*0.8, 288*0.8), (384*0.7, 288*0.7)],  # escalado de imagen --> adds grey padding pocho, need to fix
-        #img_scale=[(384*0.9, 288*0.9),(384*1.1, 288*1.1)],  # escalado de imagen --> adds grey padding pocho, need to fix
-        img_scale=[(384, 288)],
+        img_scale=[(384*0.95, 288*0.95), (384*1.05, 288*1.05)],  # escalado de imagen --> adds grey padding pocho, need to fix
+        #img_scale=[(384, 288)],
         multiscale_mode='range',
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
@@ -76,8 +76,8 @@ data = dict(
     ),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/300.json',
-        img_prefix=data_root + 'images/300/',
+        ann_file=data_root + 'annotations/renamed-valid.json',
+        img_prefix=data_root + 'images/train/',
         img_scale=(384, 288),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
@@ -87,8 +87,8 @@ data = dict(
         with_label=True),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + '../CVC-VideoClinicDBtrain_valid/annotations/test.json',
-        img_prefix=data_root + '../CVC-VideoClinicDBtrain_valid/images/test/',
+        ann_file=data_root + 'annotations/test.json',
+        img_prefix=data_root + 'images/test/',
         img_scale=(384, 288),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
@@ -99,7 +99,6 @@ data = dict(
         test_mode=True))
 # optimizer
 #optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0001)
-#optimizer = dict(type='SGD', lr=0.0075, momentum=0.9, weight_decay=0.0001)
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
@@ -112,7 +111,7 @@ lr_config = dict(
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
-    interval=10,
+    interval=50,
     hooks=[
         dict(type='TextLoggerHook'),
         # dict(type='TensorboardLoggerHook')
@@ -123,11 +122,10 @@ total_epochs = 25
 device_ids = range(4)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/exp25'
+work_dir = './work_dirs/exp28'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-#workflow = [('val', 1)]
 """
 workflow (list[tuple]): A list of (phase, epochs) to specify the
 running order and epochs. E.g, [('train', 2), ('val', 1)] means

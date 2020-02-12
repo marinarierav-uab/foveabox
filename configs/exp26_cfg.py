@@ -56,23 +56,23 @@ data = dict(
         ann_file=data_root + 'annotations/renamed-train.json',
         img_prefix=data_root + 'images/train/',
         #img_scale=[(384, 288), (384*0.9, 288*0.9), (384*0.8, 288*0.8), (384*0.7, 288*0.7)],  # escalado de imagen --> adds grey padding pocho, need to fix
-        img_scale=[(384*0.9, 288*0.9), (384*1.1, 288*1.1)],  # escalado de imagen --> adds grey padding pocho, need to fix
-        #img_scale=[(384, 288)],
+        #img_scale=[(384*0.9, 288*0.9),(384*1.1, 288*1.1)],  # escalado de imagen --> adds grey padding pocho, need to fix
+        img_scale=[(384, 288)],
         multiscale_mode='range',
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
-        flip_ratio=0.5,
+        flip_ratio=0,
         with_mask=False,
         with_crowd=False,
         with_label=True,
         # following are not yet implemented:
-        hsv_h=0.5,  # image HSV-Hue augmentation (fraction)
-        hsv_s=0.1,  # image HSV-Saturation augmentation (fraction)
-        hsv_v=0.1,  # image HSV-Value augmentation (fraction)
-        degrees=5,  # image rotation (+/- deg)
-        translate=0.1,  # image translation (+/- fraction)
-        scale=0.1,  # image scale (+/- gain)
-        shear=2  # image shear (+/- deg)
+        hsv_h=0,  # image HSV-Hue augmentation (fraction)
+        hsv_s=0,  # image HSV-Saturation augmentation (fraction)
+        hsv_v=0,  # image HSV-Value augmentation (fraction)
+        degrees=0,  # image rotation (+/- deg)
+        translate=0,  # image translation (+/- fraction)
+        scale=0,  # image scale (+/- gain)
+        shear=0  # image shear (+/- deg)
     ),
     val=dict(
         type=dataset_type,
@@ -118,11 +118,17 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 30
+total_epochs = 25
 device_ids = range(4)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/exp2'
+work_dir = './work_dirs/exp26'
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
+"""
+workflow (list[tuple]): A list of (phase, epochs) to specify the
+running order and epochs. E.g, [('train', 2), ('val', 1)] means
+running 2 epochs for training and 1 epoch for validation,
+iteratively.
+"""
