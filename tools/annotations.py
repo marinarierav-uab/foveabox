@@ -56,10 +56,66 @@ def folders_to_coco(images_dir, images_extension, masks_dir, output_file, histol
         image = image.split("/")[-1]
         coco_images[image] = im_info(image_id, image, size)
         image = image.split(".")[0]
-        masks = glob(masks_dir + image + "*")
+        masks = glob(os.path.join(masks_dir, image + "*"))
 
         seq = image.split(".")[0].split("-")[0]
         histology = histologies_correspondences[seq]
+
+        for mask in masks:
+            im_mask = cv2.imread(mask, 0)
+            res, labeled = cv2.connectedComponents(im_mask)
+
+            # TODO filter small components
+
+            for i in range(1, res):
+                ys, xs = np.where(labeled == i)
+                segm = binary_mask_to_polygon((labeled == 1).astype('uint8'))
+                box = [xs.min(), ys.min(), xs.max() - xs.min(), ys.max() - ys.min()]
+                box = [int(b) for b in box]
+                area = float((labeled == i).sum() / (labeled.shape[0] * labeled.shape[1]))
+
+                coco_annots.append(annot_info(annot_id, image_id, categories[histology]['id'], segm, area, box))
+                annot_id += 1
+        image_id += 1
+
+
+    coco_images = [im for k, im in coco_images.items()]
+
+    import json
+    out = {
+        "info": coco_info,
+        "licenses": [{
+            "id": 1,
+            "name": "---",
+            "url": "---"
+        }],
+        "categories": [item for k, item in categories.items()],
+        "images": coco_images,
+        "annotations": coco_annots
+    }
+
+    with open(output_file, "w") as f:
+        json.dump(out, f)
+
+
+
+def no_histo_folders_to_coco(images_dir, images_extension, masks_dir, output_file):
+    coco_images = {}
+    coco_annots = []
+
+    image_id = 1
+    annot_id = 1
+
+    images = glob(os.path.join(images_dir,"*." + images_extension))
+
+    for image in images:
+        size = cv2.imread(image, 0).shape
+        image = image.split("/")[-1]
+        coco_images[image] = im_info(image_id, image, size)
+        image = image.split(".")[0]
+        masks = glob(os.path.join(masks_dir, image + "*"))
+
+        histology = "AD"
 
         for mask in masks:
             im_mask = cv2.imread(mask, 0)
@@ -223,19 +279,26 @@ if __name__ == '__main__':
         }
     }
 
+
+
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-300/images",
+                    "png",
+                    "/home/marina/Downloads/DATASETS/cvc-colondb-300/mask_polyp",
+                    "/home/marina/GitHub/foveabox/data/cvc-colondb/annotations/300.json")
+
+    """
     for vid in range(1, 19):
         folders_to_coco(os.path.join("/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/images", str(vid)),
                         "png",
                         os.path.join("/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/masks", str(vid)),
                         os.path.join("/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/test", '{:02d}.json'.format(vid)),
                         train_val_histos)
-
-    """
+                        
     samples_to_coco("../data/CVC-VideoClinicDBtrain_valid/images/test-vid01/",
                     "png",
                     "../data/CVC-VideoClinicDBtrain_valid/annotations/test-vid01.json")
     
-    
+
 
     folders_to_coco("/home/marina/Documents/COCO/validtrain/img/Renamed/",
                     "png",

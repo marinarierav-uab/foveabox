@@ -1,6 +1,7 @@
 from __future__ import division
 import argparse
 import os
+import shutil
 
 import torch
 from mmcv import Config
@@ -59,7 +60,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-
+    print(args, "\n")
     cfg = Config.fromfile(args.config)
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
@@ -70,6 +71,11 @@ def main():
     if args.resume_from is not None:
         cfg.resume_from = args.resume_from
     cfg.gpus = args.gpus
+
+    output = "output/polyp/"
+    if os.path.exists(output):
+        shutil.rmtree(output)  # delete output folder
+    os.makedirs(output)  # make new output folder
 
     t = time.time()
 
