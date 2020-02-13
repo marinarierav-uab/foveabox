@@ -119,15 +119,14 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 25
+total_epochs = 20
 device_ids = range(4)
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/exp25'
 load_from = None
 resume_from = None
-workflow = [('train', 1)]
-#workflow = [('val', 1)]
+workflow = [('train', 1),('val', 1)]
 """
 workflow (list[tuple]): A list of (phase, epochs) to specify the
 running order and epochs. E.g, [('train', 2), ('val', 1)] means
