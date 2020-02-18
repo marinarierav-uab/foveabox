@@ -56,11 +56,28 @@ def calculate_average_results(results_dict: dict, thresholds, output_file):
 
         # switched values fn <-> tn, as requested by J.B.
         tp, fp, tn, fn = results[0], results[1], results[2], results[3]
-        acc = (tp + tn) / (tp + fp + fn + tn)
-        pre = tp / (tp + fp)
-        rec = tp / (tp + fn)
-        spec = tn / (fp + tn)
-        mean_rt = srt / drt
+
+        try:
+            acc = (tp + tn) / (tp + fp + fn + tn)
+        except:
+            acc = -1
+        try:
+            pre = tp / (tp + fp)
+        except:
+            pre = -1
+        try:
+            rec = tp / (tp + fn)
+        except:
+            rec = -1
+        try:
+            spec = tn / (fp + tn)
+        except:
+            spec = -1
+        try:
+            mean_rt = srt / drt
+        except:
+            mean_rt = -1
+
         f1 = (2*pre*rec) / (pre+rec)
         f2 = (5*pre*rec) / ( (4*pre) + rec)
 

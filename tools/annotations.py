@@ -279,23 +279,28 @@ if __name__ == '__main__':
         }
     }
 
+    no_histo_folders_to_coco("/home/marina/Downloads/images",
+                    "png",
+                    "/home/marina/Downloads/datasets/CVC-classification/masks",
+                    "/home/marina/GitHub/foveabox/data/HDClassif/annotations/HDClassif.json")
+
+    """
     folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
                     "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train-val/train.json",
                     train_val_histos, train=True)
+                    
     folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
                     "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train-val/val.json",
                     train_val_histos, val=True)
 
-    """
     no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-300/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/cvc-colondb-300/mask_polyp",
                     "/home/marina/GitHub/foveabox/data/cvc-colondb/annotations/300.json")
-
 
     for vid in range(1, 19):
         folders_to_coco(os.path.join("/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/images", str(vid)),
@@ -307,8 +312,6 @@ if __name__ == '__main__':
     samples_to_coco("../data/CVC-VideoClinicDBtrain_valid/images/test-vid01/",
                     "png",
                     "../data/CVC-VideoClinicDBtrain_valid/annotations/test-vid01.json")
-    
-
 
     folders_to_coco("/home/marina/Documents/COCO/validtrain/img/Renamed/",
                     "png",
@@ -342,4 +345,3 @@ if __name__ == '__main__':
                     "test.json",
                     test_histos)
     """
-
