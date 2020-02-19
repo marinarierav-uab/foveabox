@@ -24,4 +24,18 @@ if __name__ == '__main__':
     with open(args.dataset_2) as json_file:
         dataset2 = json.load(json_file)
 
+    base_id = len(dataset1['images'])
+    for image in dataset2['images']:
+        image['id'] += base_id
+        dataset1['images'].append(image)
+
+    for annot in dataset2['annotations']:
+        annot['id'] += base_id
+        dataset1['annotations'].append(annot)
+
+    with open(args.json_out, 'w') as outfile:
+        json.dump(dataset1, outfile)
+
+    print('Done!')
+
 
