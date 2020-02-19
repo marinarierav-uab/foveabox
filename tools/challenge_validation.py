@@ -20,9 +20,15 @@ def calculate_average_classif_results(results_dict: dict, thresholds, output_fil
 
         # switched values fn <-> tn, as requested by J.B.
         tp, fp, tn, fn = results[0], results[1], results[2], results[3]
-        acc = (tp + tn) / (tp + fp + fn + tn)
-        mean_conf /= len(results_dict.items())
 
+        try:
+            acc = (tp + tn) / (tp + fp + fn + tn)
+        except:
+            acc = -1
+        try:
+            mean_conf /= len(results_dict.items())
+        except:
+            mean_conf = 0
 
         # switched values fn <-> tn, as requested by J.B.
         row = [threshold, tp, fp, tn, fn, acc, mean_conf]

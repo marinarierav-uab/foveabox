@@ -51,7 +51,7 @@ def folders_to_coco(images_dir, images_extension, masks_dir, output_file, histol
     elif val:
         images = [im for im in images if int(im.split('/')[-1].split('-')[0]) >= 16]
 
-    for image in images:
+    for image in sorted(images):
         size = cv2.imread(image, 0).shape
         image = image.split("/")[-1]
         coco_images[image] = im_info(image_id, image, size)
@@ -108,7 +108,7 @@ def no_histo_folders_to_coco(images_dir, images_extension, masks_dir, output_fil
 
     images = glob(os.path.join(images_dir, "*." + images_extension))
 
-    for image in images:
+    for image in sorted(images):
         size = cv2.imread(image, 0).shape
         image = image.split("/")[-1]
         coco_images[image] = im_info(image_id, image, size)
@@ -279,23 +279,33 @@ if __name__ == '__main__':
         }
     }
 
-    no_histo_folders_to_coco("/home/marina/Downloads/images",
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-612/images",
+                    "bmp",
+                    "/home/marina/Downloads/DATASETS/cvc-colondb-612/mask_polyp",
+                    "/home/marina/GitHub/foveabox/data/cvc-colondb/annotations/612.json")
+
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-300/images",
                     "png",
-                    "/home/marina/Downloads/datasets/CVC-classification/masks",
-                    "/home/marina/GitHub/foveabox/data/HDClassif/annotations/HDClassif.json")
+                    "/home/marina/Downloads/DATASETS/cvc-colondb-300/mask_polyp",
+                    "/home/marina/GitHub/foveabox/data/cvc-colondb/annotations/300.json")
 
     """
     folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
-                    "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train-val/train.json",
+                    "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train.json",
                     train_val_histos, train=True)
-                    
+
     folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
-                    "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/train-val/val.json",
+                    "/home/marina/GitHub/foveabox/data/CVC-VideoClinicDBtrain_valid/annotations/val.json",
                     train_val_histos, val=True)
+
+    no_histo_folders_to_coco("/home/marina/Downloads/images",
+                    "png",
+                    "/home/marina/Downloads/datasets/CVC-classification/masks",
+                    "/home/marina/GitHub/foveabox/data/HDClassif/annotations/HDClassif.json")
 
     no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-300/images",
                     "png",
