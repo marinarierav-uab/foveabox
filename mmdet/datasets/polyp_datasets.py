@@ -1,12 +1,12 @@
 import numpy as np
 from pycocotools.coco import COCO
 
-from .custom import CustomDataset
+from .coco import CocoDataset
 from .registry import DATASETS
 
 
 @DATASETS.register_module
-class Polyp(CustomDataset):
+class Polyp(CocoDataset):
 
     CLASSES = ('AD', 'NA')
 
