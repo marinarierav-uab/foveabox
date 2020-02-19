@@ -19,7 +19,9 @@ def parse_args():
 if __name__ == '__main__':
 
     args = parse_args()
-    with open('data.txt') as json_file:
-        data = json.load(json_file)
+    with open(args.dataset_1) as json_file:
+        dataset1 = json.load(json_file)
+    with open(args.dataset_2) as json_file:
+        dataset2 = json.load(json_file)
 
 
