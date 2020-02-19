@@ -126,7 +126,7 @@ log_level = 'INFO'
 work_dir = './work_dirs/debug'
 load_from = None
 resume_from = None
-workflow = [('val', 1)]
+workflow = [('train',1),('val', 1)]
 """
 workflow (list[tuple]): A list of (phase, epochs) to specify the
 running order and epochs. E.g, [('train', 2), ('val', 1)] means
