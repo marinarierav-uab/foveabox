@@ -33,6 +33,7 @@ def single_gpu_test(model, data_loader, show=False):
 
         # [ < frame >, < id >, < bb_left >, < bb_top >, < bb_width >, < bb_height >, < conf >, < x >, < y >, < z >]
 
+        """
         for r in result:
             if r.size > 0:
                 bbox = r[0]
@@ -47,6 +48,7 @@ def single_gpu_test(model, data_loader, show=False):
                 detections[i] = np.concatenate((np.array([i, -1]+list(bbox[0:2])+[w, h, bbox[-1], -1, -1, -1]), f[:, 0]))
                 #print("\n", mot_challenge, "\n")
                 break
+        """
 
         # model.module.neck.fpn_convs[-1].conv.weight.shape
 
