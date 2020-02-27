@@ -44,9 +44,9 @@ class CustomDataset(Dataset):
                  img_prefix,
                  img_scale,
                  img_norm_cfg,
-                 hsv_h=0.5,  # image HSV-Hue augmentation (fraction)
-                 hsv_s=0.1,  # image HSV-Saturation augmentation (fraction)
-                 hsv_v=0.1,  # image HSV-Value augmentation (fraction)
+                 hsv_h=0,  # image HSV-Hue augmentation (fraction)
+                 hsv_s=0,  # image HSV-Saturation augmentation (fraction)
+                 hsv_v=0,  # image HSV-Value augmentation (fraction)
                  degrees=5,  # image rotation (+/- deg)
                  translate=0.1,  # image translation (+/- fraction)
                  scale=0.1,  # image scale (+/- gain)
@@ -99,7 +99,14 @@ class CustomDataset(Dataset):
         self.num_max_proposals = num_max_proposals
         # flip ratio
         self.flip_ratio = flip_ratio
-        assert flip_ratio >= 0 and flip_ratio <= 1
+        assert 0 <= flip_ratio <= 1
+        # HSV
+        self.hsv_h = hsv_h
+        self.hsv_s = hsv_s
+        self.hsv_v = hsv_v
+        assert 0 <= hsv_h <= 1
+        assert 0 <= hsv_s <= 1
+        assert 0 <= hsv_v <= 1
         # padding border to ensure the image size can be divided by
         # size_divisor (used for FPN)
         self.size_divisor = size_divisor
@@ -241,7 +248,8 @@ class CustomDataset(Dataset):
         # randomly sample a scale
         img_scale = random_scale(self.img_scales, self.multiscale_mode)
         img, img_shape, pad_shape, scale_factor = self.img_transform(
-            img, img_scale, flip, keep_ratio=self.resize_keep_ratio)
+            img, img_scale, flip, keep_ratio=self.resize_keep_ratio,
+            hsv_h=self.hsv_h, hsv_s=self.hsv_s, hsv_v=self.hsv_v)
         img = img.copy()
         if self.with_seg:
             gt_seg = mmcv.imread(

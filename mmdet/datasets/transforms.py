@@ -1,6 +1,8 @@
 import mmcv
 import numpy as np
 import torch
+import cv2
+import random
 
 __all__ = [
     'ImageTransform', 'BboxTransform', 'MaskTransform', 'SegMapTransform',
@@ -28,7 +30,27 @@ class ImageTransform(object):
         self.to_rgb = to_rgb
         self.size_divisor = size_divisor
 
-    def __call__(self, img, scale, flip=False, keep_ratio=True):
+    def __call__(self, img, scale, flip=False, keep_ratio=True, hsv_h=0, hsv_s=0, hsv_v=0):
+        # Augment colorspace
+        if hsv_h+hsv_s+hsv_v > 5:
+            # SV augmentation by 50%
+            img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)  # hue, sat, val
+            H = img_hsv[:, :, 0].astype(np.float32)  # hue
+            S = img_hsv[:, :, 1].astype(np.float32)  # saturation
+            V = img_hsv[:, :, 2].astype(np.float32)  # value
+
+            a = random.uniform(-1, 1) * hsv_h + 1
+            b = random.uniform(-1, 1) * hsv_s + 1
+            c = random.uniform(-1, 1) * hsv_v + 1
+            H *= a
+            S *= b
+            V *= c
+
+            img_hsv[:, :, 0] = H if a < 1 else H.clip(None, 255)
+            img_hsv[:, :, 1] = S if b < 1 else S.clip(None, 255)
+            img_hsv[:, :, 2] = V if c < 1 else V.clip(None, 255)
+            cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)
+
         if keep_ratio:
             img, scale_factor = mmcv.imrescale(img, scale, return_scale=True)
         else:
