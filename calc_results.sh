@@ -18,3 +18,10 @@ python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/ann
 python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json json/0217-exp32-ep20.bbox.json --out 0217-exp32-ep20
 python "tools/challenge_validation.py" --team 0217-exp31-ep20 --list
 python "tools/challenge_validation.py" --team 0217-exp32-ep20 --list
+
+
+
+
+
+python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json work_dirs/exp33/0217-exp33-ep20.bbox.json --out 0217-exp33-ep20
+python "tools/challenge_validation.py" --team 0217-exp33-ep20 --list
