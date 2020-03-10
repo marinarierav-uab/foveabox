@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import cv2
 import random
+from skimage.util import random_noise
 
 __all__ = [
     'ImageTransform', 'BboxTransform', 'MaskTransform', 'SegMapTransform',
@@ -30,7 +31,32 @@ class ImageTransform(object):
         self.to_rgb = to_rgb
         self.size_divisor = size_divisor
 
-    def __call__(self, img, scale, flip=False, keep_ratio=True, hsv_h=0, hsv_s=0, hsv_v=0):
+    def opencv_blur(self, img, mode):
+
+        if mode == 'blur':
+            return cv2.blur(img, (5, 5))
+        elif mode == 'GaussianBlur':
+            return cv2.GaussianBlur(img, (5, 5), 0)
+        elif mode == 'medianBlur':
+            return cv2.medianBlur(img, 5)
+        elif mode == 'bilateralFilter':
+            return cv2.bilateralFilter(img, 9, 75, 75)
+
+    def add_noise(self, img, mode):
+        # modes = ['gaussian', 's&p', 'poisson', 'speckle']
+
+        # random_noise() method will convert image in [0, 255] to [0, 1.0],
+        # inherently it use np.random.normal() to create normal distribution
+        # and adds the generated noised back to image
+
+        if mode == 'gaussian':
+            noise_img = random_noise(img, mode=mode, var=0.05 ** 2)
+        else:
+            noise_img = random_noise(img, mode=mode)
+        return (255 * noise_img).astype(np.uint8)
+
+
+    def __call__(self, img, scale, flip=False, keep_ratio=True, hsv_h=0, hsv_s=0, hsv_v=0, noisy_mode=None, blur_mode=None):
         # Augment colorspace
         if hsv_h+hsv_s+hsv_v > 5:
             # SV augmentation by 50%
@@ -50,6 +76,14 @@ class ImageTransform(object):
             img_hsv[:, :, 1] = S if b < 1 else S.clip(None, 255)
             img_hsv[:, :, 2] = V if c < 1 else V.clip(None, 255)
             cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)
+
+        # Add noise
+        if noisy_mode is not None:
+            img = self.add_noise(img, noisy_mode)
+
+        # Blur
+        if blur_mode is not None:
+            img = self.opencv_blur(img, blur_mode)
 
         if keep_ratio:
             img, scale_factor = mmcv.imrescale(img, scale, return_scale=True)

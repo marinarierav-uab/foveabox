@@ -51,6 +51,8 @@ class CustomDataset(Dataset):
                  translate=0.1,  # image translation (+/- fraction)
                  scale=0.1,  # image scale (+/- gain)
                  shear=2,  # image shear (+/- deg)
+                 noisy_mode=None,
+                 blur_mode=None,
                  multiscale_mode='value',
                  size_divisor=None,
                  proposal_file=None,
@@ -110,6 +112,12 @@ class CustomDataset(Dataset):
         # padding border to ensure the image size can be divided by
         # size_divisor (used for FPN)
         self.size_divisor = size_divisor
+
+        self.noisy_mode = noisy_mode
+        assert noisy_mode in [None, 'gaussian', 'poisson', 's&p', 'speckle']
+
+        self.blur_mode = blur_mode
+        assert blur_mode in [None, 'blur', 'bilateralFilter', 'GaussianBlur', 'medianBlur']
 
         # with mask or not (reserved field, takes no effect)
         self.with_mask = with_mask
