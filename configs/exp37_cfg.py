@@ -68,7 +68,8 @@ data = dict(
         hsv_h=0.,  # image HSV-Hue augmentation (fraction)
         hsv_s=0.,  # image HSV-Saturation augmentation (fraction)
         hsv_v=0.,  # image HSV-Value augmentation (fraction)
-        noisy_mode='bilateralFilter',
+        noisy_mode=None,
+        blur_mode='bilateralFilter',
         # following are not yet implemented:
         degrees=0,  # image rotation (+/- deg)
         translate=0,  # image translation (+/- fraction)
