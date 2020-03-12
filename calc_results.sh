@@ -28,3 +28,16 @@ python "tools/challenge_validation.py" --team 0217-exp33-ep20 --list
 
 python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json json/0309-exp34-ep20.bbox.json --out 0309-exp34-ep20
 python "tools/challenge_validation.py" --team 0309-exp34-ep20
+
+
+# generate csv
+python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json json/0311-exp35-ep20.bbox.json --out 0311-exp35-ep20
+python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json json/0311-exp36-ep20.bbox.json --out 0311-exp36-ep20
+python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json json/0311-exp37-ep20.bbox.json --out 0311-exp37-ep20
+python "tools/csv_generator.py" --original data/CVC-VideoClinicDBtrain_valid/annotations/test.json --json json/0311-exp38-ep20.bbox.json --out 0311-exp38-ep20
+
+# calculate average results
+python "tools/challenge_validation.py" --team 0311-exp35-ep20 --list
+python "tools/challenge_validation.py" --team 0311-exp36-ep20 --list
+python "tools/challenge_validation.py" --team 0311-exp37-ep20 --list
+python "tools/challenge_validation.py" --team 0311-exp38-ep20 --list
