@@ -202,7 +202,7 @@ data = dict(
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/test.json',
+        ann_file=data_root + 'annotations/test-vid01.json',
         img_prefix=data_root +  'images/test/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')

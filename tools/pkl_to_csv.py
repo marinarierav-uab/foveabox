@@ -1,6 +1,7 @@
 import argparse
 import os
 import json
+import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -8,7 +9,7 @@ import cv2
 def show_csv(team, output, original):
 
     if output=="":
-        output = team.split('.bbox.json')[0].split('json/')[-1]
+        output = team.split('.pkl')[0].split('pkl/')[-1]
 
     writelines_detection = dict()
     writelines_localization = dict()
@@ -21,48 +22,37 @@ def show_csv(team, output, original):
         data = json.load(json_file)
         images = data['images']
 
-    with open(team) as json_file:
-        data = json.load(json_file)
+    with open(team, 'rb') as pkl_file:
+        data = pickle.load(pkl_file)
 
     if not os.path.exists('results/Detection/' + output):
         os.makedirs('results/Detection/' + output)  # make new output folder
     if not os.path.exists('results/Localization/' + output):
         os.makedirs('results/Localization/' + output)  # make new output folder
 
-    already_seen_vids = []
+    for image_id, image in enumerate(data):
 
-    acc_id = 0
-    for i, image in enumerate(data):
+        det = image[0]
+        if len(det)>0:
+            image_name = images[image_id]['file_name']
+            nvid = image_name.split('-')[0]
 
-        image_id = image['image_id']
-        image_name = images[image_id-1]['file_name']
+            det = det[0]
+            x1 = int(det[0])
+            y1 = int(det[1])
+            x2 = int(det[2])
+            y2 = int(det[3])
 
-        nvid = image_name.split('-')[0]
+            cx = int(x1 + (x2-x1)/2)
+            cy = int(y1 + (y2-y1)/2)
 
-        if nvid not in already_seen_vids:
-            acc_id = image_id-1
-            already_seen_vids.append(nvid)
+            conf = det[4]
+            clase = 1
 
-        det = image['bbox']
-        x1 = int(det[0])
-        y1 = int(det[1])
-        w = int(det[2])
-        h = int(det[3])
-
-        cx = int(x1 + w/2)
-        cy = int(y1 + h/2)
-
-        conf = image['score']
-        clase = image['category_id']
-
-        """
-        --------->>> IMAGE_ID <<<------------
-        """
-
-        # DETECT
-        writelines_detection[nvid].append([image_id-acc_id-1, 1, conf])
-        # LOCAL
-        writelines_localization[nvid].append([image_id-acc_id-1, cx, cy, conf, clase])
+            # DETECT
+            writelines_detection[nvid].append([image_id, 1, conf])
+            # LOCAL
+            writelines_localization[nvid].append([image_id, cx, cy, conf, clase])
 
     for vid in range(1, 19):
         nvid = format(int(vid), '03d')
@@ -85,11 +75,11 @@ def show_csv(team, output, original):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--json', type=str, help='name of json detected bbox annotations file')
+    parser.add_argument('--pkl', type=str, help='name of pkl with detected bbox annotations file')
     parser.add_argument('--original', type=str, help='name of json original annotation file')
     parser.add_argument("--out", "--output_folder", type=str, default=None)
 
     opt = parser.parse_args()
     print(opt)
 
-    show_csv(opt.json, opt.out, opt.original)
+    show_csv(opt.pkl, opt.out, opt.original)

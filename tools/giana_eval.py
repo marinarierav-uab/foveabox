@@ -364,7 +364,7 @@ def main():
         os.makedirs(path_to_output_loc)
     if not os.path.exists(path_to_output_classif):
         os.makedirs(path_to_output_classif)
-        
+
     do_giana_eval(path_to_input_det,
                   path_to_input_loc,
                   path_to_gt,
