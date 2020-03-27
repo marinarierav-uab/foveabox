@@ -30,13 +30,17 @@ def show_csv(team, output, original):
     if not os.path.exists('results/Localization/' + output):
         os.makedirs('results/Localization/' + output)  # make new output folder
 
+    already_seen_vids = []
+    i=0
     for image_id, image in enumerate(data):
 
         det = image[0]
         if len(det)>0:
             image_name = images[image_id]['file_name']
             nvid = image_name.split('-')[0]
-
+            if nvid not in already_seen_vids:
+                i=0
+                already_seen_vids.append(nvid)
             det = det[0]
             x1 = int(det[0])
             y1 = int(det[1])
@@ -50,9 +54,10 @@ def show_csv(team, output, original):
             clase = 1
 
             # DETECT
-            writelines_detection[nvid].append([image_id, 1, conf])
+            writelines_detection[nvid].append([i, 1, conf])
             # LOCAL
-            writelines_localization[nvid].append([image_id, cx, cy, conf, clase])
+            writelines_localization[nvid].append([i, cx, cy, conf, clase])
+            i+=1
 
     for vid in range(1, 19):
         nvid = format(int(vid), '03d')
