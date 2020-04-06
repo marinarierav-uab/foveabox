@@ -273,7 +273,8 @@ def do_giana_eval(path_to_input_det,
                   thr=0, series=False):
 
     # DEBUGGING !!!!!
-    nvids = 18  # should be 18
+    from_vid = 1  # should be 1
+    to_vid = 18  # should be 18
 
     if series:
         thrs = [x / 10 for x in range(1, 10)]
@@ -282,8 +283,8 @@ def do_giana_eval(path_to_input_det,
     else:
         thrs = [0]
 
-    files_detection = sorted(os.listdir(path_to_input_det))[0:nvids]
-    files_localization = sorted(os.listdir(path_to_input_loc))[0:nvids]
+    files_detection = sorted(os.listdir(path_to_input_det))[from_vid-1:to_vid]
+    files_localization = sorted(os.listdir(path_to_input_loc))[from_vid-1:to_vid]
 
     results_detection = {}
     results_localization = {}
