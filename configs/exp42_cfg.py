@@ -39,7 +39,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=81,
+            num_classes=3,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.1, 0.1, 0.2, 0.2],
             reg_class_agnostic=True,
@@ -57,7 +57,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=81,
+            num_classes=3,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.05, 0.05, 0.1, 0.1],
             reg_class_agnostic=True,
@@ -75,7 +75,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=81,
+            num_classes=3,
             target_means=[0., 0., 0., 0.],
             target_stds=[0.033, 0.033, 0.067, 0.067],
             reg_class_agnostic=True,
@@ -173,18 +173,20 @@ test_cfg = dict(
         score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=100),
     keep_all_stages=False)
 # dataset settings
-dataset_type = 'CocoDataset'
-data_root = 'data/coco/'
+dataset_type = 'Polyp'
+data_root = 'data/CVC-VideoClinicDBtrain_valid/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 data = dict(
     imgs_per_gpu=2,
-    workers_per_gpu=2,
+    workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_train2017.json',
-        img_prefix=data_root + 'train2017/',
-        img_scale=(1333, 800),
+        ann_file=data_root + 'annotations/renamed-train.json',
+        img_prefix=data_root + 'images/train/',
+        #img_scale=[(384, 288), (384*0.9, 288*0.9), (384*0.8, 288*0.8), (384*0.7, 288*0.7)],  # escalado de imagen --> adds grey padding pocho, need to fix
+        #img_scale=[(384*0.9, 288*0.9),(384*1.1, 288*1.1)],  # escalado de imagen --> adds grey padding pocho, need to fix
+        img_scale=[(384, 288)],
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0.5,
@@ -193,9 +195,9 @@ data = dict(
         with_label=True),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
-        img_scale=(1333, 800),
+        ann_file=data_root + 'annotations/renamed-valid.json',
+        img_prefix=data_root + 'images/train/',
+        img_scale=(384, 288),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0,
@@ -204,9 +206,9 @@ data = dict(
         with_label=True),
     test=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
-        img_scale=(1333, 800),
+        ann_file=data_root + 'annotations/test.json',
+        img_prefix=data_root + 'images/test/',
+        img_scale=(384, 288),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
         flip_ratio=0,
@@ -214,7 +216,7 @@ data = dict(
         with_label=False,
         test_mode=True))
 # optimizer
-optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.0025, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
 # learning policy
 lr_config = dict(
@@ -233,10 +235,10 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 12
+total_epochs = 20
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/cascade_rcnn_r50_fpn_1x'
+work_dir = './work_dirs/exp42'
 load_from = None
 resume_from = None
-workflow = [('train', 1)]
+workflow = [('train', 1),('val', 1)]
