@@ -226,8 +226,18 @@ def main():
         outputs = multi_gpu_test(model, data_loader, args.tmpdir)
 
 
-
     rank, _ = get_dist_info()
+
+    # Save predictions in the COCO json format
+    if args.json_out and rank == 0:
+        if not isinstance(outputs[0], dict):
+            results2json(dataset, outputs, args.json_out)
+        else:
+            for name in outputs[0]:
+                outputs_ = [out[name] for out in outputs]
+                result_file = args.json_out + '.{}'.format(name)
+                results2json(dataset, outputs_, result_file)
+
     if args.out and rank == 0:
         print('\nwriting results to {}'.format(args.out))
         mmcv.dump(outputs, args.out)
@@ -249,16 +259,6 @@ def main():
                         result_files = results2json(dataset, outputs_,
                                                     result_file)
                         coco_eval(result_files, eval_types, dataset.coco)
-
-    # Save predictions in the COCO json format
-    if args.json_out and rank == 0:
-        if not isinstance(outputs[0], dict):
-            results2json(dataset, outputs, args.json_out)
-        else:
-            for name in outputs[0]:
-                outputs_ = [out[name] for out in outputs]
-                result_file = args.json_out + '.{}'.format(name)
-                results2json(dataset, outputs_, result_file)
 
 
 if __name__ == '__main__':
