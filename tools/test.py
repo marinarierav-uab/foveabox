@@ -52,8 +52,8 @@ def single_gpu_test(model, data_loader, show=False):
 
         # model.module.neck.fpn_convs[-1].conv.weight.shape
 
-        if show:
-            model.module.show_result(data, result, dataset.img_norm_cfg, i)
+        if show: # Not showing now, instead does imwrite.
+            model.module.show_result(data, result, dataset.img_norm_cfg, i, False)
 
         batch_size = data['img'][0].size(0)
         for _ in range(batch_size):

@@ -92,6 +92,7 @@ class BaseDetector(nn.Module):
                     result,
                     img_norm_cfg,
                     frame_index,
+                    show=False,
                     dataset=None,
                     score_thr=0.3):
         if isinstance(result, tuple):
@@ -140,6 +141,7 @@ class BaseDetector(nn.Module):
                 img_show,
                 bboxes,
                 labels,
+                show=show,
                 class_names=class_names,
                 wait_time=1,
                 out_file="output/polyp/"+str("{:04d}".format(frame_index))+".png",

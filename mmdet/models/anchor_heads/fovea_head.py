@@ -482,18 +482,20 @@ class FoveaHead(nn.Module):
         det_scores = torch.cat([padding, det_scores], dim=1)
 
         if debug:
-            det_bboxes, det_labels, det_feats = multiclass_nms(
+            #det_bboxes, det_labels, det_feats = multiclass_nms(
+            det_bboxes, det_labels =multiclass_nms(
                 det_bboxes,
                 det_scores,
-                det_feats,
+                #det_feats,
                 cfg['score_thr'],
                 cfg['nms'],
                 cfg['max_per_img'])
         else:
-            det_bboxes, det_labels, det_feats = multiclass_nms(
+            #det_bboxes, det_labels, det_feats = multiclass_nms(
+            det_bboxes, det_labels = multiclass_nms(
                 det_bboxes,
                 det_scores,
-                det_feats,
+                #det_feats,
                 cfg.score_thr,
                 cfg.nms,
                 cfg.max_per_img)

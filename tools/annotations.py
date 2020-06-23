@@ -115,7 +115,7 @@ def no_histo_folders_to_coco(images_dir, images_extension, masks_dir, output_fil
         image = image.split(".")[0]
         masks = glob(os.path.join(masks_dir, image + "*"))
 
-        histology = "AD"
+        histology = "Polyp"
 
         for mask in masks:
             im_mask = cv2.imread(mask, 0)
@@ -267,10 +267,18 @@ if __name__ == '__main__':
     }
 
     categories = {
-        "AD": {
+        "Polyp": {
             'id': 1,
-            'name': 'AD',
+            'name': 'Polyp',
             'supercategory': 'polyp',
+        }
+    }
+    """
+    categories = {
+        "AD": {
+                'id': 1,
+                'name': 'AD',
+                'supercategory': 'polyp',
         },
         "NA": {
             'id': 0,
@@ -278,7 +286,43 @@ if __name__ == '__main__':
             'supercategory': 'polyp',
         }
     }
+    """
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
+                             "png",
+                             "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
+                             "/home/marina/GitHub/data/CVC-VideoClinicDBtrain_valid/annotations/train-polyp.json")
 
+    """ 1-CLASS: POLYP (NO HISTOLOGY)
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-612/images",
+                             "bmp",
+                             "/home/marina/Downloads/DATASETS/cvc-colondb-612/mask_polyp",
+                             "/home/marina/GitHub/data/cvc-colondb/annotations/612-polyp.json")
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-300/images",
+                             "png",
+                             "/home/marina/Downloads/DATASETS/cvc-colondb-300/mask_polyp",
+                             "/home/marina/GitHub/data/cvc-colondb/annotations/300-polyp.json")
+    no_histo_folders_to_coco("/home/marina/Downloads/images",
+                             "png",
+                             "/home/marina/Downloads/datasets/CVC-classification/masks",
+                             "/home/marina/GitHub/data/HDClassif/annotations/HDClassif-polyp.json")
+
+    no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
+                             "png",
+                             "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
+                             "/home/marina/GitHub/data/CVC-VideoClinicDBtrain_valid/annotations/train-polyp.json")
+                    
+    no_histo_folders_to_coco("/home/marina/GitHub/data/CVC-VideoClinicDBtrain_valid/images/test-vid01/",
+                             "png",
+                             "/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/masks-18test",
+                             "/home/marina/GitHub/data/CVC-VideoClinicDBtrain_valid/annotations/test-vid01-polyp.json")
+    no_histo_folders_to_coco("/home/marina/GitHub/data/CVC-VideoClinicDBtrain_valid/images/test",
+                             "png",
+                             "/home/marina/Downloads/DATASETS/cvcvideoclinicdbtest/masks-18test",
+                             "/home/marina/GitHub/data/CVC-VideoClinicDBtrain_valid/annotations/test-polyp.json")
+    """
+
+
+    """
     no_histo_folders_to_coco("/home/marina/Downloads/DATASETS/cvc-colondb-612/images",
                     "bmp",
                     "/home/marina/Downloads/DATASETS/cvc-colondb-612/mask_polyp",
@@ -288,8 +332,7 @@ if __name__ == '__main__':
                     "png",
                     "/home/marina/Downloads/DATASETS/cvc-colondb-300/mask_polyp",
                     "/home/marina/GitHub/foveabox/data/cvc-colondb/annotations/300.json")
-
-    """
+                    
     folders_to_coco("/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/images",
                     "png",
                     "/home/marina/Downloads/DATASETS/CVC-VideoClinicDBtrain_valid/masks",
